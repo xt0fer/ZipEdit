@@ -1,4 +1,4 @@
-# ZipEdit
+# ZipEdit (_Beta_)
 
 Things to add to the Zip Edit text editor....
 
