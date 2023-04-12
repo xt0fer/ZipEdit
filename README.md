@@ -21,3 +21,6 @@ Can you add:
 - add a terminal pane that comes and goes based on a menu item at the bottom of the JFrame
 - be sure to run the user's preferred SHELL in the terminal
 
+## Adding the "java vi" code
+
+--kyounger
