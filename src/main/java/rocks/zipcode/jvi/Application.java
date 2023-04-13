@@ -10,6 +10,11 @@ public class Application {
     public Application(String filename) {
         this._fileName = filename;
         this._textView = new View(24, 80, 0, 0);
+        this.drawEmpty();
+    }
+
+    private void drawEmpty() {
+        
     }
 
     public static void main(String[] args) throws Exception {

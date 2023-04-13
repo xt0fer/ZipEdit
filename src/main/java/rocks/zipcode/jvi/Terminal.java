@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 /**
- * The Escape Codes used throught this project are the vt100/ansi/xterm ones
+ * The Escape Codes used throughout this project are the vt100/ansi/xterm ones
  * Keep it simple
  */
 public class Terminal {
@@ -71,6 +71,11 @@ public class Terminal {
     }
     public void cursorZero() {
         putString("\033[H");
+    }
+
+    public void setCursor(int r, int c) {
+        String s = "\u001b["+r+";"+c+"H";
+        putString(s);
     }
 
     public void cursorHide() {
