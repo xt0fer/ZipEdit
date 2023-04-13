@@ -2,6 +2,8 @@
 
 jvi is a simple text editor based on the famous article : 
 [Build Your Own Text Editor](https://viewsourcecode.org/snaptoken/kilo/index.html)
+And also
+[Designing And Writing Vim From Scratch In 3 Weeks](https://medium.com/@dwang.me/designing-and-writing-vim-from-scratch-in-3-weeks-871f8283ce2f)
 
 Only this one is a re-write in Java. Used as the basis for a "add features to" lab of Zip Code Wilmington.
 

@@ -29,6 +29,7 @@ public class Application {
     // private vars
     private Mode _mode;
     private View _textView;
+
     private Stack<Command> _commandStack;
     private View _statusView;
     private DebugView _debugView;
