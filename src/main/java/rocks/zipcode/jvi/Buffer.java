@@ -17,7 +17,8 @@ public class Buffer {
     // FileHelper _fileHelper;
 
     public Buffer(Integer maxLines) {
-        this._text = new ArrayList<>();
+        _text = new ArrayList<>();
+        _text.add(0, new StringBuffer(""));
     }
 
     public String readFile(String fileName) {
@@ -25,6 +26,10 @@ public class Buffer {
     }
 
     public void replaceCharacter(Character c, Integer x, Integer y) {
+        _point.set(x, y);
+        StringBuffer line = _text.get(x);
+        line.deleteCharAt(y);
+        line.insert(y, Character.toString(c));
     }
 
     public void insertCharacter(Character c, Integer x, Integer y) {
@@ -53,9 +58,17 @@ public class Buffer {
     }
 
     public void deleteLine(Integer y) {
+        if (_hasLine(y)) _text.remove(y.intValue());
+    }
+
+    private boolean _hasLine(Integer y) {
+        if (y >= 0 && y < _text.size()) return true;
+        return false;
     }
 
     public void clear() {
+        _text.clear();
+        _text.add(0, new StringBuffer(""));
     }
 
     //
@@ -64,7 +77,7 @@ public class Buffer {
     // */
     //
     public Integer getNumLines() {
-        return 0;
+        return _text.size();
     }
 
     //
@@ -106,6 +119,9 @@ public class Buffer {
     public void disableInsertMode() {
         _insertModeEnabled = false;
     }
+    public boolean insertModeOn() {
+        return _insertModeEnabled;
+    }
 
     //
     // std::pair<Integer, Integer> find(const std::string& s, bool fromCurrentLine =
@@ -134,11 +150,13 @@ public class Buffer {
         this.setBuffer(s);
     }
 
-    public String contents() {
+    @Override
+    public String toString() {
         StringBuffer fsb = new StringBuffer();
         Iterator<StringBuffer> sbi = _text.iterator();
         while (sbi.hasNext()) {
             fsb.append(sbi.next());
+            fsb.append("\n");
         }
         return fsb.toString();
     }
@@ -155,10 +173,13 @@ public class Buffer {
     private void setBuffer(String s) {
         String[] sarray = s.split("\n");
         for (String s0 : sarray)
-            append(s0);
+            this.textappend(s0);
     }
 
-    private void append(String s) {
+    private void textappend(String s) {
+        if (_text.size() == 1 && _text.get(0).toString().equals("")){
+            _text.clear();
+        }
         _text.add(new StringBuffer(s));
     }
 

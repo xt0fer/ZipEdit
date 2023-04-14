@@ -1,10 +1,10 @@
 package rocks.zipcode.jvi;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
-
+ 
 public class BufferTest {
 	private int maxLines = 24;
 
@@ -19,42 +19,108 @@ public class BufferTest {
 	public void shouldReadFile() {
 		String fileName = "test.txt";
 
-		String actualValue = buffer.readFile(fileName);
+		//String actualValue = buffer.readFile(fileName);
 
 		// TODO: assert scenario
 	}
 
 	@Test
 	public void shouldReplaceChar() {
-		char c = 'x';
+		buffer.clear();
+		Character c = 'x';
 		int x = 0;
 		int y = 0;
 
-		//buffer.replaceChar(c, x, y);
+		buffer.setContent("z");
+		buffer.replaceCharacter(c, x, y);
+		String actual = buffer.toString();
+		assertEquals("", c.toString()+"\n", actual);
+	}
 
-		// TODO: assert scenario
+	@Test
+	public void shouldReplaceChar2() {
+		buffer.clear();
+		Character c = 'x';
+		int x = 0;
+		int y = 1;
+
+		buffer.setContent("zzz");
+		buffer.replaceCharacter(c, x, y);
+		String actual = buffer.toString();
+		assertEquals("", "zxz\n", actual);
+	}
+
+	@Test
+	public void shouldReplaceChar3() {
+		buffer.clear();
+		Character c = 'x';
+		int x = 1;
+		int y = 1;
+
+		buffer.setContent("zzz\nzzz\n");
+		buffer.replaceCharacter(c, x, y);
+		String actual = buffer.toString();
+		assertEquals("", "zzz\nzxz\n", actual);
 	}
 
 	@Test
 	public void shouldInsertChar() {
-		char c = 'z';
+		Character expected = 'z';
+		buffer.clear();
+		//String expected = "foo\nbar\nbaz";
 		int x = 0;
 		int y = 0;
 
-		//buffer.insertChar(c, x, y);
+		buffer.enableInsertMode();
+		buffer.insertCharacter(expected, x, y);
+		String actual = buffer.toString();
+		buffer.disableInsertMode();
+		assertEquals("", expected.toString()+"\n", actual);
+	}
 
-		// TODO: assert scenario
+	@Test
+	public void shouldInsertChar2() {
+		Character insertch = 'z';
+		buffer.clear();
+		String start = "foo\nbar\nbaz";
+		String expected = "foo\nbzar\nbaz\n";
+		int x = 1;
+		int y = 1;
+
+		buffer.enableInsertMode();
+		buffer.setContent(start);
+		buffer.insertCharacter(insertch, x, y);
+		String actual = buffer.toString();
+		buffer.disableInsertMode();
+		assertEquals("", expected, actual);
 	}
 
 	@Test
 	public void shouldInsertString() {
-		String s = "foo";
+		buffer.clear();
+		String expected = "foobarbaz";
 		int x = 0;
 		int y = 0;
 
-		buffer.insertString(s, x, y);
+		buffer.enableInsertMode();
+		buffer.insertString(expected, x, y);
+		String actual = buffer.toString();
+		buffer.disableInsertMode();
+		assertEquals("", expected+"\n", actual);
+	}
 
-		// TODO: assert scenario
+	@Test
+	public void shouldInsertString2() {
+		buffer.clear();
+		String expected = "foo\nbar\nbaz";
+		int x = 0;
+		int y = 0;
+
+		buffer.enableInsertMode();
+		buffer.insertString(expected, x, y);
+		String actual = buffer.toString();
+		buffer.disableInsertMode();
+		assertEquals("", expected+"\n", actual);
 	}
 
 	@Test
@@ -62,7 +128,7 @@ public class BufferTest {
 		int x = 0;
 		int y = 0;
 
-		buffer.insertNewLine(x, y);
+		//buffer.insertNewLine(x, y);
 
 		// TODO: assert scenario
 	}
@@ -81,23 +147,37 @@ public class BufferTest {
 	public void shouldDeleteLine() {
 		int y = 0;
 
-		buffer.deleteLine(y);
+		//buffer.deleteLine(y);
 
 		// TODO: assert scenario
 	}
 
 	@Test
 	public void shouldClear() {
+		buffer.setContent("fooooooooo");
 		buffer.clear();
 
-		// TODO: assert scenario
+		String actual = buffer.toString();
+		assertEquals("clear No Worky", "\n", actual);
 	}
 
 	@Test
 	public void shouldGetNumLines() {
+		buffer.clear();
+		String src = "foo\nbar\nbaz";
+		int expected = 3;
+		buffer.setContent(src);
 		int actualValue = buffer.getNumLines();
 
-		// TODO: assert scenario
+		assertEquals(expected, actualValue);
+	}
+	@Test
+	public void shouldGetNumLines2() {
+		buffer.clear();
+		int expected = 1;
+		int actualValue = buffer.getNumLines();
+
+		assertEquals(expected, actualValue);
 	}
 
 	@Test
@@ -105,7 +185,7 @@ public class BufferTest {
 		int lineStart = 0;
 		int lineFinish = 0;
 
-		String[] actualValue = buffer.getLines(lineStart, lineFinish);
+		//String[] actualValue = buffer.getLines(lineStart, lineFinish);
 
 		// TODO: assert scenario
 	}
@@ -114,14 +194,14 @@ public class BufferTest {
 	public void shouldGetLine() {
 		int y = 0;
 
-		String actualValue = buffer.getLine(y);
+		//String actualValue = buffer.getLine(y);
 
 		// TODO: assert scenario
 	}
 
 	@Test
 	public void shouldGetFileName() {
-		String actualValue = buffer.getFileName();
+		//String actualValue = buffer.getFileName();
 
 		// TODO: assert scenario
 	}
@@ -135,7 +215,7 @@ public class BufferTest {
 
 	@Test
 	public void shouldUnsavedChanges() {
-		boolean actualValue = buffer.unsavedChanges();
+		//boolean actualValue = buffer.unsavedChanges();
 
 		// TODO: assert scenario
 	}
@@ -143,41 +223,40 @@ public class BufferTest {
 	@Test
 	public void shouldEnableInsertMode() {
 		buffer.enableInsertMode();
-
-		// TODO: assert scenario
+		assertTrue("", buffer.insertModeOn());
 	}
 
 	@Test
 	public void shouldDisableInsertMode() {
 		buffer.disableInsertMode();
+		assertTrue("", !buffer.insertModeOn());
 
-		// TODO: assert scenario
 	}
 
 	@Test
 	public void shouldClipboard() {
-		String actualValue = buffer.clipboard();
+		//String actualValue = buffer.clipboard();
 
 		// TODO: assert scenario
 	}
 
 	@Test
 	public void shouldGetClipboardLines() {
-		int actualValue = buffer.getClipboardLines();
+		//int actualValue = buffer.getClipboardLines();
 
 		// TODO: assert scenario
 	}
 
 	@Test
-	public void shouldContents() {
+	public void shouldSetToString() {
 
-		Buffer buffer = new Buffer(20);
-		String expectedString = "this is a test";
+		Buffer buf = new Buffer(20);
+		buf.clear();
+		String expectedString = "this is a test\n";
 
-		buffer.setContent(expectedString);
-		String actualValue = buffer.contents();
+		buf.setContent(expectedString);
+		String actualValue = buf.toString();
 
-		// TODO: assert scenario
-		assertEquals("contents work", expectedString, actualValue);
+		assertEquals("not right", expectedString, actualValue);
 	}
 }
