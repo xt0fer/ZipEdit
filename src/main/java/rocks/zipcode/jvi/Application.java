@@ -3,14 +3,28 @@ package rocks.zipcode.jvi;
 import rocks.zipcode.jvi.util.Stack;
 
 // Second (and ongoing) version.
-public class Application {
+public class Application implements Runnable {
+   // private vars
+   private Mode _mode;
+   private View _textView;
 
-    private Application() {}
+   private Stack<Command> _commandStack;
+   private View _statusView;
+   private DebugView _debugView;
+   String _highlighterUsed;
+   String _fileName;
+
+   //Arraylist<Highlighter> _highlighters;
+   private boolean _debugModeEnabled;
 
     public Application(String filename) {
-        this._fileName = filename;
-        this._textView = new View(24, 80, 0, 0);
-        this.drawEmpty();
+        _mode = Mode.COMMAND;
+        _fileName = filename;
+        _textView = new View(24, 80, 0, 0);
+        drawEmpty();
+        if (filename != "") {
+            
+        }
     }
 
     private void drawEmpty() {
@@ -22,6 +36,7 @@ public class Application {
             throw new Exception("No filename on command line");
         }
         Application app = new Application(args[1]);
+        app.run();
     }
     public Mode getMode() { return null; }
     public void setMode(Mode newmode) {}
@@ -31,17 +46,19 @@ public class Application {
 
 //   public void addHighlighter(HighLighter highlighter);
 
-    // private vars
-    private Mode _mode;
-    private View _textView;
+ 
+    @Override
+    public void run() {
+        Command what;
 
-    private Stack<Command> _commandStack;
-    private View _statusView;
-    private DebugView _debugView;
-    String _highlighterUsed;
-    String _fileName;
+        updateViews();
+        updateStatusView("ready");
+        while (true) {
+            what = getCommand();
 
-    //Arraylist<Highlighter> _highlighters;
-    private boolean _debugModeEnabled;
+            if (what == Command.QUIT) break;
+
+        }
+    }
 
 }

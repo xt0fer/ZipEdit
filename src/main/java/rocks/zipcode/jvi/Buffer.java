@@ -55,6 +55,9 @@ public class Buffer {
     }
 
     public void deleteCharacter(Integer x, Integer y) {
+        _point.set(x, y);
+        StringBuffer line = _text.get(x);
+        line.deleteCharAt(y);
     }
 
     public void deleteLine(Integer y) {

@@ -19,9 +19,9 @@ public class BufferTest {
 	public void shouldReadFile() {
 		String fileName = "test.txt";
 
-		//String actualValue = buffer.readFile(fileName);
+		String actualValue = buffer.readFile(fileName);
 
-		// TODO: assert scenario
+		assertEquals("", fileName, actualValue);
 	}
 
 	@Test
@@ -127,10 +127,12 @@ public class BufferTest {
 	public void shouldInsertNewLine() {
 		int x = 0;
 		int y = 0;
-
-		//buffer.insertNewLine(x, y);
-
-		// TODO: assert scenario
+		boolean result = false;
+		int l1 = buffer.getNumLines();
+		buffer.insertNewLine(x, y);
+		int l2 = buffer.getNumLines();
+		if (l1 + 1 == l2) result = true;
+		assertTrue(null, result);
 	}
 
 	@Test
@@ -140,16 +142,19 @@ public class BufferTest {
 
 		//buffer.deleteChar(x, y);
 
-		// TODO: assert scenario
+		assertTrue(null, false);
 	}
 
 	@Test
 	public void shouldDeleteLine() {
 		int y = 0;
 
-		//buffer.deleteLine(y);
-
-		// TODO: assert scenario
+		boolean result = false;
+		int l1 = buffer.getNumLines();
+		buffer.deleteLine(y);
+		int l2 = buffer.getNumLines();
+		if (l1 - 1 == l2) result = true;
+		assertTrue(null, result);
 	}
 
 	@Test
@@ -187,7 +192,7 @@ public class BufferTest {
 
 		//String[] actualValue = buffer.getLines(lineStart, lineFinish);
 
-		// TODO: assert scenario
+		assertTrue(null, false);
 	}
 
 	@Test
@@ -196,28 +201,28 @@ public class BufferTest {
 
 		//String actualValue = buffer.getLine(y);
 
-		// TODO: assert scenario
+		assertTrue(null, false);
 	}
 
 	@Test
 	public void shouldGetFileName() {
 		//String actualValue = buffer.getFileName();
 
-		// TODO: assert scenario
+		assertTrue(null, false);
 	}
 
 	@Test
 	public void shouldSaveFile() {
 		buffer.saveFile();
 
-		// TODO: assert scenario
+		assertTrue(null, false);
 	}
 
 	@Test
 	public void shouldUnsavedChanges() {
 		//boolean actualValue = buffer.unsavedChanges();
 
-		// TODO: assert scenario
+		assertTrue(null, false);
 	}
 
 	@Test
@@ -237,14 +242,14 @@ public class BufferTest {
 	public void shouldClipboard() {
 		//String actualValue = buffer.clipboard();
 
-		// TODO: assert scenario
+		assertTrue(null, false);
 	}
 
 	@Test
 	public void shouldGetClipboardLines() {
 		//int actualValue = buffer.getClipboardLines();
 
-		// TODO: assert scenario
+		assertTrue(null, false);
 	}
 
 	@Test
