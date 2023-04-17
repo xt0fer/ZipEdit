@@ -1,13 +1,49 @@
 package rocks.zipcode.jvi;
 
 public class Controller {
- public Controller(Application app) {
-     this._app = app;
- }
+    private Application _app;
+    private View _view;
+    private Window _window;
+    private String _lastSearchCommand;
+    private String _lastFindChar;
 
-private Controller() {}
+    public Controller(Application app, View v) {
+        _app = app;
+        _view = v;
+        _window = v.get_window();
+    }
 
-    public void listenForInputs() {}
+    public void listenForInputs() {
+        Command what;
+
+        while (true) {
+            _app.updateViews();
+            _app.updateStatusView("ready");
+            what = getCommand();
+
+            if (what == Command.QUIT) break;
+
+        }
+
+    }
+    private Command getCommand() {
+        do {
+            int currentKey = _window.readKey();
+            Character ch = (char)currentKey;
+            Command what = Command.get(Character.toString(ch));
+
+            if (what == Command.COLON) {
+                _app.setMode(Mode.COMMAND);
+                continue;
+            }
+            if (_app.getMode() == Mode.COMMAND) {
+                if (what == Command.QUIT) {
+                    return what;
+                }
+            }
+        } while (true);
+    }
+
 
 
     private void listenInsertMode() {}
@@ -18,14 +54,10 @@ private Controller() {}
                                     boolean forward, boolean fromCurrentLine) {}
     private void performFindChar() {}
 
-    private Application _app;
-    private boolean _quit;
-    private String _lastSearchCommand;
-    private String _lastFindChar;
 //
-    private void handleCursorMovement(int c) {}
+    private void handleCursorMovement(int deltar, int deltac) {}
     private void handleClearAndDeleteCommands(boolean isClearCommand, int times) {}
     private void handleYank(int times) {}
-    int _repeatCommandNum = 0;
+    private int _repeatCommandNum = 0;
 
 }

@@ -13,7 +13,7 @@ public class View {
 
     public void printBufferContent() {
         
-        this._window.draw(this._buffer);
+        //this._window.draw(this._buffer);
     }
 
 //    public void setHighlighter(Highlighter highlighter) {}
@@ -31,6 +31,9 @@ public class View {
     private int _height;
     private String _content;
     private Window _window;
+    public Window get_window() {
+        return _window;
+    }
     private Buffer _buffer;
     private Cursor _cursor;
 

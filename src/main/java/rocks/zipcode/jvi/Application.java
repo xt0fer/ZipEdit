@@ -7,6 +7,7 @@ public class Application implements Runnable {
    // private vars
    private Mode _mode;
    private View _textView;
+   private Controller _controller;
 
    private Stack<Command> _commandStack;
    private View _statusView;
@@ -21,27 +22,25 @@ public class Application implements Runnable {
         _mode = Mode.COMMAND;
         _fileName = filename;
         _textView = new View(24, 80, 0, 0);
-        drawEmpty();
+        _controller = new Controller(this, _textView);
         if (filename != "") {
-            
-        }
-    }
 
-    private void drawEmpty() {
-        
+        }
     }
 
     public static void main(String[] args) throws Exception {
-        if (args.length < 2) {
-            throw new Exception("No filename on command line");
-        }
-        Application app = new Application(args[1]);
+        // if (args.length < 1) {
+        //     throw new Exception("No filename on command line");
+        // }
+        Application app = new Application("test.txt");
         app.run();
     }
     public Mode getMode() { return null; }
     public void setMode(Mode newmode) {}
     public void updateViews() {}
-    public void updateStatusView(String status) {}
+    public void updateStatusView(String status) {
+        System.out.println("ready");
+    }
     public int getChar() { return 0; }
 
 //   public void addHighlighter(HighLighter highlighter);
@@ -49,16 +48,7 @@ public class Application implements Runnable {
  
     @Override
     public void run() {
-        Command what;
-
-        updateViews();
-        updateStatusView("ready");
-        while (true) {
-            what = getCommand();
-
-            if (what == Command.QUIT) break;
-
-        }
+        _controller.listenForInputs();
     }
 
 }

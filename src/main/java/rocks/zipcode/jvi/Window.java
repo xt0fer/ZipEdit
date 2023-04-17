@@ -13,7 +13,7 @@ public class Window {
         _rows = rows;
         _cols = cols;
         _term = new Terminal();
-        _cursor.setCursor(0, 0);
+        _cursor = new Cursor(0, 0);
     }
     public Window() {this(24,80);}
 
@@ -28,6 +28,10 @@ public class Window {
 
     public Point getCursor() {
         return _cursor.getXY();
+    }
+
+    public int readKey() {
+        return _term.readKey();
     }
     
     // public void setBuffer(Buffer b) {

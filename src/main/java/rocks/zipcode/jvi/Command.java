@@ -5,18 +5,85 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public enum Command {
-    ESC("\u001b"),
-    COLON(":"),
-    NUM(";"),
-    NOP(""),
-    ERR("E"),
-    QUIT("q"),
-    SAVE("w"),
+    // ESC("\u001b"),
+    COLON(":") {
+        @Override
+        boolean execute() {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'execute'");
+        }
 
-    CLEAR("C"),
-    HELP("?"),
+        @Override
+        boolean undo() {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'undo'");
+        }
+
+        @Override
+        boolean canUndo() {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'canUndo'");
+        }
+    },
+    // NUM(";"),
+    // NOP(""),
+    ERR("E") {
+        @Override
+        boolean execute() {
+            return false;
+        }
+
+        @Override
+        boolean undo() {
+            return false;
+        }
+
+        @Override
+        boolean canUndo() {
+            return false;
+        }
+    },
+    QUIT("q") {
+        @Override
+        boolean execute() {
+            return false;
+        }
+
+        @Override
+        boolean undo() {
+            return false;
+        }
+
+        @Override
+        boolean canUndo() {
+            return false;
+        }
+    },
+    SAVE("w") {
+        @Override
+        boolean execute() {
+            return false;
+        }
+
+        @Override
+        boolean undo() {
+            return false;
+        }
+
+        @Override
+        boolean canUndo() {
+            return false;
+        }
+    },
+
+    // CLEAR("C"),
+    // HELP("?"),
     // etc...
     ;
+
+    abstract boolean execute();
+    abstract boolean undo();
+    abstract boolean canUndo();
 
     private String name;
 
