@@ -13,6 +13,7 @@ public class Window {
         _rows = rows;
         _cols = cols;
         _term = new Terminal();
+        _term.setRawMode();
         _cursor = new Cursor(0, 0);
     }
     public Window() {this(24,80);}
@@ -32,6 +33,10 @@ public class Window {
 
     public int readKey() {
         return _term.readKey();
+    }
+
+    public void done() {
+        _term.setCookedMode();;
     }
     
     // public void setBuffer(Buffer b) {

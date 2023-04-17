@@ -24,7 +24,7 @@ public class Controller {
             if (what == Command.QUIT) break;
 
         }
-
+        _window.done();
     }
     private Command getCommand() {
         do {
