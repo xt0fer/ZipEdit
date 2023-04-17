@@ -21,10 +21,10 @@ public class Terminal {
     Logger logger = Logger.getLogger("MyLog");
     FileHandler fh;
 
-
     public Terminal() {
         console = System.console();
         reader = console.reader();
+        setRawMode();
 
         // logging
         try {
@@ -40,7 +40,10 @@ public class Terminal {
 
     public int readKey() {
         try {
-            return reader.read();
+            int key = reader.read();
+            if (key == 0x0003)
+                _terminate();
+            return key;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -59,38 +62,48 @@ public class Terminal {
         System.out.flush();
     }
 
+    private void _terminate() {
+        Terminal.setCookedMode();
+        System.out.println("Terminating!");
+        System.exit(-1);
+    }
+
     public int getRows() {
         return this._rows;
     }
+
     public int getCols() {
         return this._cols;
     }
+
     // adds ability to clear terminal screen
     public void blankScreen() {
         putString("\033[2J");
     }
+
     public void cursorZero() {
         putString("\033[H");
     }
 
     public void setCursor(int r, int c) {
-        String s = "\u001b["+r+";"+c+"H";
+        String s = "\u001b[" + r + ";" + c + "H";
         putString(s);
     }
 
     public void cursorHide() {
         putString("\033[?25l");
     }
+
     public void cursorShow() {
         putString("\033[?25h");
     }
+
     public void clearToEOL() {
         putString("\033[K");
     }
 
-
     static void setRawMode() {
-        String[] cmd = {"/bin/sh", "-c", "stty raw </dev/tty"};
+        String[] cmd = { "/bin/sh", "-c", "stty raw </dev/tty" };
         try {
             Runtime.getRuntime().exec(cmd).waitFor();
         } catch (InterruptedException e) {
@@ -101,7 +114,7 @@ public class Terminal {
     }
 
     static void setCookedMode() {
-        String[] cmd = {"/bin/sh", "-c", "stty cooked </dev/tty"};
+        String[] cmd = { "/bin/sh", "-c", "stty cooked </dev/tty" };
         try {
             Runtime.getRuntime().exec(cmd).waitFor();
         } catch (InterruptedException e) {
@@ -111,22 +124,23 @@ public class Terminal {
         }
     }
 
-     public void logString(String s) {
+    public void logString(String s) {
         StringBuilder sb = new StringBuilder();
         for (char ch : s.toCharArray()) {
             if (Character.isISOControl(ch)) {
-                sb.append(String.format("0x%02x", (int)ch));
+                sb.append(String.format("0x%02x", (int) ch));
             } else {
                 sb.append(String.format(".%c", (char) ch));
             }
         }
         logger.info(sb.toString());
     }
+
     public void logList(ArrayList<Integer> s) {
         StringBuilder sb = new StringBuilder();
         for (int ch : s) {
             if (Character.isISOControl(ch)) {
-                sb.append(String.format(".0x%02x", (int)ch));
+                sb.append(String.format(".0x%02x", (int) ch));
             } else {
                 sb.append(String.format("-%c", (char) ch));
             }
@@ -138,22 +152,21 @@ public class Terminal {
         return ((k) & 0x1f);
     }
 
-
     // you might ask, what magic incantation is this,
     // and I'd say "'tis ancient vt100" that works on
     // xterms and mac terms are xterms sorta.
     public Point getTerminalSize() throws IOException {
-        System.out.printf( "\u001b[s" +             // save cursor position
-                "\u001b[5000;5000H" +    // move to col 5000 row 5000
-                "\u001b[6n" +           // request cursor position
-                "\u001b[u" );            // restore cursor position
+        System.out.printf("\u001b[s" + // save cursor position
+                "\u001b[5000;5000H" + // move to col 5000 row 5000
+                "\u001b[6n" + // request cursor position
+                "\u001b[u"); // restore cursor position
         System.out.flush();
         int read = -1;
         StringBuilder sb = new StringBuilder();
         byte[] buff = new byte[1];
         while ((read = System.in.read(buff, 0, 1)) != -1) {
             sb.append((char) buff[0]);
-            //System.err.printf("Read %s chars, buf size=%s%n", read, sb.length());
+            // System.err.printf("Read %s chars, buf size=%s%n", read, sb.length());
             if ('R' == buff[0]) {
                 break;
             }

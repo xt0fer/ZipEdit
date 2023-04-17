@@ -1,5 +1,8 @@
 package rocks.zipcode.jvi;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -22,7 +25,22 @@ public class Buffer {
     }
 
     public String readFile(String fileName) {
-        return "";
+        BufferedReader reader;
+
+        try {
+            reader = new BufferedReader(new FileReader(fileName));
+            String line = reader.readLine();
+
+            while (line != null) {
+                this.textappend(line);
+                line = reader.readLine();
+            }
+
+            reader.close();
+        } catch (IOException e) {
+            return "Unable to read file";
+        }
+        return "File read";
     }
 
     public void replaceCharacter(Character c, Integer x, Integer y) {
@@ -61,11 +79,13 @@ public class Buffer {
     }
 
     public void deleteLine(Integer y) {
-        if (_hasLine(y)) _text.remove(y.intValue());
+        if (_hasLine(y))
+            _text.remove(y.intValue());
     }
 
     private boolean _hasLine(Integer y) {
-        if (y >= 0 && y < _text.size()) return true;
+        if (y >= 0 && y < _text.size())
+            return true;
         return false;
     }
 
@@ -97,7 +117,9 @@ public class Buffer {
     }
 
     public String getLine(Integer y) {
-        return _text.get(y).toString();
+        if (y < _text.size())
+            return _text.get(y).toString();
+        return "~";
     }
 
     public String getFileName() {
@@ -122,6 +144,7 @@ public class Buffer {
     public void disableInsertMode() {
         _insertModeEnabled = false;
     }
+
     public boolean insertModeOn() {
         return _insertModeEnabled;
     }
@@ -180,7 +203,7 @@ public class Buffer {
     }
 
     private void textappend(String s) {
-        if (_text.size() == 1 && _text.get(0).toString().equals("")){
+        if (_text.size() == 1 && _text.get(0).toString().equals("")) {
             _text.clear();
         }
         _text.add(new StringBuffer(s));
