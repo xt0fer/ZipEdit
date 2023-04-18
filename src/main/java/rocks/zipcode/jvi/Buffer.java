@@ -148,7 +148,9 @@ public class Buffer {
     public boolean insertModeOn() {
         return _insertModeEnabled;
     }
-
+    public void insertChar(Character ch) {
+        insert(Character.toString(ch));
+    }
     //
     // std::pair<Integer, Integer> find(const std::string& s, bool fromCurrentLine =
     // true);

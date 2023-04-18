@@ -19,35 +19,54 @@ public class Controller {
         while (true) {
             _app.updateViews();
             _app.updateStatusView(status);
+            _window.setCursor(0, 0);
             what = getCommand();
 
             if (what == Command.QUIT)
                 break;
             if (what == Command.COLON) {
+                // move cursor to status line.
                 status = ":";
             }
+            if (what == Command.ERR) {
+                status = "error";
+            }
+            if (what == Command.INSERT) {
+                listenInsertMode();
+            }
+
         }
     }
 
     private Command getCommand() {
-        do {
-            int currentKey = _window.readKey();
-            Character ch = (char) currentKey;
-            Command what = Command.get(Character.toString(ch));
+        int currentKey = _window.readKey();
+        Character ch = (char) currentKey;
+        Command what = Command.get(Character.toString(ch));
 
-            if (what == Command.COLON) {
-                _app.setMode(Mode.COMMAND);
+        if (what == Command.COLON) {
+            _app.setMode(Mode.COMMAND);
+            return what;
+        }
+        if (_app.getMode() == Mode.COMMAND) {
+            if (what == Command.QUIT) {
                 return what;
             }
-            if (_app.getMode() == Mode.COMMAND) {
-                if (what == Command.QUIT) {
-                    return what;
-                }
-            }
-        } while (true);
+        }
+        return what;
     }
 
     private void listenInsertMode() {
+        _app.setMode(Mode.INSERT);
+        do {
+            int currentKey = _window.readKey();
+            Character ch = (char) currentKey;
+
+            if (ch == 27)
+                break;
+            _view.insertAtCursor(ch);
+            _app.updateViews();
+        } while (true);
+        _app.setMode(Mode.COMMAND);
     }
 
     private void listenCommandMode() {

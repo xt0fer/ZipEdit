@@ -76,6 +76,23 @@ public enum Command {
         }
     },
 
+    INSERT("i") {
+        @Override
+        boolean execute() {
+            return false;
+        }
+
+        @Override
+        boolean undo() {
+            return false;
+        }
+
+        @Override
+        boolean canUndo() {
+            return false;
+        }
+    },
+
     // CLEAR("C"),
     // HELP("?"),
     // etc...

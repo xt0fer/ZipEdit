@@ -36,7 +36,10 @@ public class View {
 
     public void resetCursor() {
     }
-
+    public void insertAtCursor(Character ch) {
+        _buffer.insertChar(ch);
+    }
+    
     public void setBuffer(String text) {
         _buffer.setContent(text);
     }
