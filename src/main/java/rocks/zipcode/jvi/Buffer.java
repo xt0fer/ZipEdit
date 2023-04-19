@@ -107,6 +107,9 @@ public class Buffer {
             return text.get(r).toString();
         return "~";
     }
+    public int getLineLen(Integer r) {
+        return getLine(r).length();
+    }
 
     public String getFileName() {
         return fileName;

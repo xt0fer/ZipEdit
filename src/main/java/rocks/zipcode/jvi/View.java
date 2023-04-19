@@ -35,12 +35,15 @@ public class View {
 
         int tr = (r < rows) ? r : rows;
         int tc = (c < cols) ? c : cols;
+        int lineLen = buffer.getLineLen(tr);
+        tc = (tc < lineLen) ? tc : lineLen;
+
         cursor.setCursor(tr, tc);
     }
 
-    public void deltaCursor(int deltar, int deltac) {
+    public void deltaCursor(int deltaR, int deltaC) {
         Point tp = cursor.getRC();
-        setCursor(tp.r() + deltar, tp.c() + deltac);
+        setCursor(tp.r() + deltaR, tp.c() + deltaC);
     }
 
     public Point getCursor() {
@@ -50,22 +53,6 @@ public class View {
     public void insertAtCursor(Character ch) {
         buffer.setPoint(cursor.getRC());
         buffer.insertChar(ch);
-    }
-
-    public void leftCursor() {
-        deltaCursor(0, 1);
-    }
-
-    public void rightCursor() {
-        deltaCursor(0, -1);
-    }
-
-    public void upCursor() {
-        deltaCursor(-1, 0);
-    }
-
-    public void downCursor() {
-        deltaCursor(1, 0);
     }
 
     public void setBuffer(String text) {

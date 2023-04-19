@@ -203,7 +203,6 @@ public enum Command {
     }
 
     public static Command get(String name) {
-        
         return ENUMMAP.getOrDefault(name, Command.ERR);
     }
 
