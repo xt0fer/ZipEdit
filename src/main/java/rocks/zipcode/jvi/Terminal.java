@@ -15,20 +15,18 @@ import java.util.logging.SimpleFormatter;
 public class Terminal {
     Console console;
     Reader reader;
-    int _rows, _cols;
+    int rows, cols;
+    int row, col;
 
+    private boolean debugModeEnabled;
     // logging
-    Logger logger = Logger.getLogger("MyLog");
+    Logger logger = Logger.getLogger("JVI");
     FileHandler fh;
 
     public Terminal() {
-        console = System.console();
-        reader = console.reader();
-        setRawMode();
-
         // logging
         try {
-            fh = new FileHandler("jvi-log.txt");
+            fh = new FileHandler("jvi.log");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -36,13 +34,23 @@ public class Terminal {
         SimpleFormatter formatter = new SimpleFormatter();
         fh.setFormatter(formatter);
         logger.setUseParentHandlers(false);
+
+        // setup
+        console = System.console();
+        reader = console.reader();
+        setRawMode();
+
+        this.cursorZero();
+        this.blankScreen();
     }
+
+    // call getTerminalSize right after construction.
 
     public int readKey() {
         try {
             int key = reader.read();
             if (key == 0x0003)
-                _terminate();
+                terminate();
             return key;
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -62,18 +70,18 @@ public class Terminal {
         System.out.flush();
     }
 
-    private void _terminate() {
+    private void terminate() {
         Terminal.setCookedMode();
         System.out.println("Terminating!");
         System.exit(-1);
     }
 
     public int getRows() {
-        return this._rows;
+        return this.rows;
     }
 
     public int getCols() {
-        return this._cols;
+        return this.cols;
     }
 
     // adds ability to clear terminal screen
@@ -82,12 +90,42 @@ public class Terminal {
     }
 
     public void cursorZero() {
+        row = 1;
+        col = 1;
         putString("\033[H");
     }
 
     public void setCursor(int r, int c) {
-        String s = "\u001b[" + r + ";" + c + "H";
+        // switch from 0-based to one-based
+        row = r + 1;
+        col = c + 1;
+        int tr = (r < rows) ? row : rows;
+        int tc = (c < cols) ? col : cols;
+
+        String s = "\u001b[" + tr + ";" + tc + "H";
         putString(s);
+    }
+
+    public void setCursor(Point p) {
+        setCursor(p.r(), p.c());
+    }
+
+    public void deltaCursor(int deltar, int deltac) {
+        setCursor(deltar + row, deltac + col);
+    }
+
+    public void drawStringAt(String s, int r, int c) {
+        setCursor(r, c);
+        putString(s);
+    }
+
+    public void clearToEOL(int r, int c) {
+        setCursor(r, c);
+        clearToEOL();
+    }
+
+    public Point getCursor() {
+        return new Point(row - 1, col - 1); // switch from 1-based to zero-based
     }
 
     public void cursorHide() {
@@ -161,10 +199,9 @@ public class Terminal {
                 "\u001b[6n" + // request cursor position
                 "\u001b[u"); // restore cursor position
         System.out.flush();
-        int read = -1;
         StringBuilder sb = new StringBuilder();
         byte[] buff = new byte[1];
-        while ((read = System.in.read(buff, 0, 1)) != -1) {
+        while (System.in.read(buff, 0, 1) != -1) {
             sb.append((char) buff[0]);
             // System.err.printf("Read %s chars, buf size=%s%n", read, sb.length());
             if ('R' == buff[0]) {
@@ -172,10 +209,10 @@ public class Terminal {
             }
         }
         String size = sb.toString();
-        this._rows = Integer.parseInt(size.substring(size.indexOf("\u001b[") + 2, size.indexOf(';')));
-        this._cols = Integer.parseInt(size.substring(size.indexOf(';') + 1, size.indexOf('R')));
-        logger.info(String.format("Terminal size (%d,%d)", this._rows, this._cols));
-        return new Point(this._rows, this._cols);
+        this.rows = Integer.parseInt(size.substring(size.indexOf("\u001b[") + 2, size.indexOf(';')));
+        this.cols = Integer.parseInt(size.substring(size.indexOf(';') + 1, size.indexOf('R')));
+        logger.info(String.format("Terminal size (%d,%d)", this.rows, this.cols));
+        return new Point(this.rows, this.cols);
     }
 
 }

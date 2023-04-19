@@ -1,5 +1,11 @@
 # jvi
 
+*run in a terminal to test:*
+
+```
+mvn compile exec:java -Dexec.mainClass="rocks.zipcode.jvi.Application"
+```
+
 jvi is a simple text editor based on the famous article : 
 [Build Your Own Text Editor](https://viewsourcecode.org/snaptoken/kilo/index.html)
 And also
@@ -7,21 +13,25 @@ And also
 
 Only this one is a re-write in Java. Used as the basis for a "add features to" lab of Zip Code Wilmington.
 
+## Implementation Notes
+
+The Terminal class is where all the vt100/xterm terminal screen codes are kept. It's also where the raw/cooked modes of the tty is handled. Input comes thru it via `readKey()`
+The Terminal class is a 1-based coordinate system, not zero-based like the datastructures, Buffer, Views and Window classes.
+
 ## vm notes
 
 Vm is a Vim-like text editor that was built from scratch in Java.
 
-In this lab we will talk about the overall design of our program, and the object-oriented programming 
-concepts and design patterns we use as we build this project.
+In this lab we will talk about the overall design of our program, and the object-oriented programming concepts and design patterns we use as we build this project.
 
 ## A Brief History on Vim
 
-Vi was the original screen oriented text editor created for the Unix operating system, 
-written by Bill Joy in 1976.
+Vi was the original screen oriented text editor created for the Unix operating system, written by Bill Joy in 1976. (yes, 1976)
 
-Vim (Vi IMproved) is a greatly improved clone of Vi written by Bram Moolenaar released in 1991. 
-It has since then become one of the world’s most popular text editors, coming in at the 
-top 4 for most popular development environments in 2017’s Stack Overflow developer survey.
+Vim (Vi IMproved) is a greatly improved clone of Vi written by Bram Moolenaar released in 1991.
+It has since then become one of the world’s most popular text editors, coming in at the top 4 for most popular development environments in 2017’s Stack Overflow developer survey.
+
+## Design Principles
 
 Three big areas:
 
@@ -29,69 +39,58 @@ Three big areas:
 - Design Patterns
 - Data Structures For Text
 
-## Design Principles
-
 ### SOLID
 
-The term SOLID is a mnemonic acronym for five design principles intended to make software designs 
-more understandable, flexible and maintainable.
+The term SOLID is a mnemonic acronym for five design principles intended to make software designs more understandable, flexible and maintainable.
 
-Single Responsibility: All of our classes have single responsibility of doing one task except for 
-Controller. If you can’t easily say a class does x, then think about breaking it up into smaller parts.
+Single Responsibility: All of our classes have single responsibility of doing one task except for Controller.
+If you can’t easily say a class does x, then think about breaking it up into smaller parts.
 
-Open/Closed Principle: Software should be open for extension, but closed for modification. 
-Does a change in the project specification result in you changing much of the interface of your class, 
-or does it just mean you need to extend your existing class?
+Open/Closed Principle: Software should be open for extension, but closed for modification.
+Does a change in the project specification result in you changing much of the interface of your class, or does it just mean you need to extend your existing class?
 
-The View class is open for extension and closed for modification. We wanted to create an additional 
-view that would display certain values, cursor positions, and the command stack, so instead of 
-adding that optional functionality in View, we created a subclass DebugView that contained the functionality we wanted. All member variables of all classes are private to that class and we have getters and setters only when needed.
+The View class is open for extension and closed for modification. 
+We wanted to create an additional view that would display certain values, cursor positions, and the command stack, so instead of adding that optional functionality in View, we created a subclass DebugView that contained the functionality we wanted.
+All member variables of all classes are private to that class and we have getters and setters only when needed.
 
-Liskov Substitution: Is your code still correct if you replace an object of type A with and object 
-of type B, if B is a subclass of A? Does substituting for a higher level (more general/abstract) 
-of class break anything? It shouldn’t. And you use that fact to your advantage to write great code.
+Liskov Substitution: Is your code still correct if you replace an object of type A with and object of type B, if B is a subclass of A? Does substituting for a higher level (more general/abstract) of class break anything? 
+It shouldn’t. And you use that fact to your advantage to write great code.
 
-We used Liskov substitution mainly in two parts: Commands and Views. For any subtype of command, 
-replacing one with another will not cause the program to crash or produce undefined behaviour 
-(other than the fact that the command is executing a different series of actions). It can be safely 
-assumed that calling `canUndo`, `execute`, and `undo` on any subtype of `Command` will work.
+We used Liskov substitution mainly in two parts: Commands and Views. For any subtype of command, replacing one with another will not cause the program to crash or produce undefined behaviour (other than the fact that the command is executing a different series of actions). 
+It can be safely assumed that calling `canUndo`, `execute`, and `undo` on any subtype of `Command` will work.
 
-Interface Segregation: Many small interfaces is better than one large interface. 
+Interface Segregation: Many small interfaces is better than one large interface.
 If a class has many functionalities, each client of the class should only see the functionality it needs.
 
-Most interfaces only needed to serve a single client in our project, so there was no need to 
-make a more specific interface for each client. But this is a good general rule!
+Most interfaces only needed to serve a single client in our project, so there was no need to make a more specific interface for each client.
+But this is a good general rule!
 
-Dependency Inversion: High level modules should not depend on low-level modules. Both should 
-depend on abstraction. Abstract classes should never depend on concrete classes.
+Dependency Inversion: High level modules should not depend on low-level modules.
+Both should depend on abstraction. 
+Abstract classes should never depend on concrete classes.
 
-All fully abstract classes we had (Command.h) did not inherit from or depend on a concrete 
-class. All classes interacted and depended on other classes of the same level of abstraction. 
-For example, the View class depends/interacts on other high-level classes like `Highlighter` and `Cursor`, 
-rather than their lower level subclasses or underlying data structures such as `CppHighlighter` or `ViewCursor`.
+All fully abstract classes we had (Command.h) did not inherit from or depend on a concrete class. 
+All classes interacted and depended on other classes of the same level of abstraction. 
+For example, the View class depends/interacts on other high-level classes like `Highlighter` and `Cursor`, rather than their lower level subclasses or underlying data structures such as `CppHighlighter` or `ViewCursor`.
 
 
-Model-View-Controller
-As part of the single responsibility principle, we created three classes that each handle a 
-single aspect of Vm with respect to an application that interacts with a user.
+### Model-View-Controller
+
+As part of the single responsibility principle, we created three classes that each handle a single aspect of Vm with respect to an application that interacts with a user.
 
 Model: Application.java
 
-The Application class is responsible for storing the state of the current instance through MODEs 
-and directs the controller to act accordingly.
+The Application class is responsible for storing the state of the current instance through MODEs and directs the controller to act accordingly.
 
 View: View.java
-The View class is responsible for outputting the buffer contents or any output to the screen 
-and syntax highlighting.
+The View class is responsible for outputting the buffer contents or any output to the screen and syntax highlighting.
 
 Controller: Controller.java
 
-The Controller class handles each input depending on the current MODE of the editor and 
-makes changes to the View via the ViewCursor and/or the Buffer classes.
-
--Wikipedia
+The Controller class handles each input depending on the current MODE of the editor and makes changes to the View via the ViewCursor and/or the Buffer classes.
 
 ## Design Patterns
+
 The general principles of SOLID paid off well, since we didn’t run into many situations 
 where we didn’t know what type of design path we should take. We didn’t use many design 
 patterns as we thought, and I don’t think that is a bad thing. You should never be trying to 
@@ -111,23 +110,17 @@ each individual function, which doesn’t feel like good object-oriented program
 But it will make your undo function as easy as
 
 ```java
-if (!_app.commandStack().empty() && _app.commandStack().top().canUndo()) {
-  _app.commandStack().top()->undo();
-  _app.commandStack().pop();
+if (!app.commandStack().empty() && app.commandStack().top().canUndo()) {
+  app.commandStack().top()->undo();
+  app.commandStack().pop();
 }
 ```
 
 ### Data Structures For Text
 
-A lot of thought went into deciding which data structure we should use to hold and 
-manipulate the text of our files. Which ones would prove to be the fastest, 
-the most memory efficient, the clearest to code? These were all really fun to consider. 
-BUT, no. 
-SO, we ended up using a arraylist of strings.
-
-
-
-
+A lot of thought went into deciding which data structure we should use to hold and manipulate the text of our files. Which ones would prove to be the fastest, the most memory efficient, the clearest to code? These were all really fun to consider.
+BUT, no.
+SO, we ended up using a arraylist of stringbuffers.
 
 
 --kyounger, Apr 2023.

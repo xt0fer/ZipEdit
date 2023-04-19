@@ -79,7 +79,80 @@ public enum Command {
     INSERT("i") {
         @Override
         boolean execute() {
+            crtlr.listenInsertMode();
+            return true;
+        }
+
+        @Override
+        boolean undo() {
             return false;
+        }
+
+        @Override
+        boolean canUndo() {
+            return false;
+        }
+    },
+
+    UP("j") {
+        @Override
+        boolean execute() {
+            crtlr.handleCursorMovement(-1, 0);
+            return true;
+        }
+
+        @Override
+        boolean undo() {
+            return false;
+        }
+
+        @Override
+        boolean canUndo() {
+            return false;
+        }
+    },
+
+    DOWN("k") {
+        @Override
+        boolean execute() {
+            crtlr.handleCursorMovement(1, 0);
+            return true;
+        }
+
+        @Override
+        boolean undo() {
+            return false;
+        }
+
+        @Override
+        boolean canUndo() {
+            return false;
+        }
+    },
+
+    LEFT("l") {
+        @Override
+        boolean execute() {
+            crtlr.handleCursorMovement(0, 1);
+            return true;
+        }
+
+        @Override
+        boolean undo() {
+            return false;
+        }
+
+        @Override
+        boolean canUndo() {
+            return false;
+        }
+    },
+
+    RIGHT("h") {
+        @Override
+        boolean execute() {
+            crtlr.handleCursorMovement(0, -1);
+            return true;
         }
 
         @Override
@@ -99,14 +172,18 @@ public enum Command {
     ;
 
     abstract boolean execute();
+
     abstract boolean undo();
+
     abstract boolean canUndo();
 
     private String name;
 
-    private static final Map<String,Command> ENUM_MAP;
+    private static final Map<String, Command> ENUMMAP;
 
-    Command (String name) {
+    private static Controller crtlr;
+
+    Command(String name) {
         this.name = name;
     }
 
@@ -118,15 +195,20 @@ public enum Command {
     // Any Map impl can be used.
 
     static {
-        Map<String,Command> map = new ConcurrentHashMap<String, Command>();
+        Map<String, Command> map = new ConcurrentHashMap<String, Command>();
         for (Command instance : Command.values()) {
-            map.put(instance.getName(),instance);
+            map.put(instance.getName(), instance);
         }
-        ENUM_MAP = Collections.unmodifiableMap(map);
+        ENUMMAP = Collections.unmodifiableMap(map);
     }
 
-    public static Command get (String name) {
-        return ENUM_MAP.getOrDefault(name, Command.ERR);
+    public static Command get(String name) {
+        
+        return ENUMMAP.getOrDefault(name, Command.ERR);
+    }
+
+    public static void setController(Controller controller) {
+        crtlr = controller;
     }
 
 }

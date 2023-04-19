@@ -1,15 +1,22 @@
 package rocks.zipcode.jvi;
 
 public class Cursor {
-    private Point _point;
+    private Point point;
+
     public Cursor() {
-        this(0,0);
+        this(0, 0);
     }
+
     public Cursor(int r, int c) {
-        this._point = new Point(0,0);
+        this.point = new Point(0, 0);
     }
-    public Point getXY() {return new Point(_point.x(), _point.y()); }
-    public void setCursor(int x, int y) {
-        this._point.set(x,y);
+
+    public Point getRC() {
+        return new Point(point.r(), point.c());
     }
+
+    public void setCursor(int r, int c) {
+        this.point.set(r, c);
+    }
+
 }

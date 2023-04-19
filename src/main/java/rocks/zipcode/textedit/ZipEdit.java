@@ -15,17 +15,18 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public final class ZipEdit extends JFrame implements ActionListener{
+public final class ZipEdit extends JFrame implements ActionListener {
     private JTextArea area;
     private JFrame frame;
     private String filename = "untitled";
-    public ZipEdit() {  }
+
+    public ZipEdit() {
+    }
 
     public static void main(String[] args) {
         ZipEdit runner = new ZipEdit();
         runner.run();
     }
-
 
     public void run() {
         frame = new JFrame(frameTitle());
@@ -34,77 +35,80 @@ public final class ZipEdit extends JFrame implements ActionListener{
         // Try to default to whatever the host system prefers
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+                | UnsupportedLookAndFeelException ex) {
             Logger.getLogger(ZipEdit.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         // Set attributes of the app window
         area = new JTextArea();
-        //Border blackline = BorderFactory.createLineBorder(Color.black);
-        //area.setBorder(blackline);
+        // Border blackline = BorderFactory.createLineBorder(Color.black);
+        // area.setBorder(blackline);
         area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         area.setText("");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.EXITONCLOSE);
         frame.add(area);
         frame.setLocationRelativeTo(null);
         frame.setSize(640, 480);
 
         // Build the menu
-        JMenuBar menu_main = new JMenuBar();
+        JMenuBar menumain = new JMenuBar();
 
-        JMenu menu_file = new JMenu("File");
+        JMenu menufile = new JMenu("File");
 
-        JMenuItem menuitem_new = new JMenuItem("New");
-        JMenuItem menuitem_open = new JMenuItem("Open");
-        JMenuItem menuitem_save = new JMenuItem("Save");
-        JMenuItem menuitem_quit = new JMenuItem("Quit");
+        JMenuItem menuitemnew = new JMenuItem("New");
+        JMenuItem menuitemopen = new JMenuItem("Open");
+        JMenuItem menuitemsave = new JMenuItem("Save");
+        JMenuItem menuitemquit = new JMenuItem("Quit");
 
-        menuitem_new.addActionListener(this);
-        menuitem_open.addActionListener(this);
-        menuitem_save.addActionListener(this);
-        menuitem_quit.addActionListener(this);
+        menuitemnew.addActionListener(this);
+        menuitemopen.addActionListener(this);
+        menuitemsave.addActionListener(this);
+        menuitemquit.addActionListener(this);
 
-        menu_main.add(menu_file);
+        menumain.add(menufile);
 
-        menu_file.add(menuitem_new);
-        menu_file.add(menuitem_open);
-        menu_file.add(menuitem_save);
-        menu_file.add(menuitem_quit);
+        menufile.add(menuitemnew);
+        menufile.add(menuitemopen);
+        menufile.add(menuitemsave);
+        menufile.add(menuitemquit);
 
-        frame.setJMenuBar(menu_main);
+        frame.setJMenuBar(menumain);
 
         frame.setVisible(true);
 
     }
 
     public String frameTitle() {
-        return "Zip Edit ("+this.filename+")";
+        return "Zip Edit (" + this.filename + ")";
     }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         String ingest = "";
         JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
         jfc.setDialogTitle("Choose destination.");
-        jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        jfc.setFileSelectionMode(JFileChooser.FILESANDDIRECTORIES);
 
         String ae = e.getActionCommand();
         int returnValue;
         if (ae.equals("Open")) {
             returnValue = jfc.showOpenDialog(null);
-            if (returnValue == JFileChooser.APPROVE_OPTION) {
+            if (returnValue == JFileChooser.APPROVEOPTION) {
                 File f = new File(jfc.getSelectedFile().getAbsolutePath());
                 this.filename = jfc.getSelectedFile().getName();
                 this.frame.setTitle(this.frameTitle());
-                try{
+                try {
                     FileReader read = new FileReader(f);
                     Scanner scan = new Scanner(read);
-                    while(scan.hasNextLine()){
+                    while (scan.hasNextLine()) {
                         String line = scan.nextLine() + "\n";
                         ingest = ingest + line;
                     }
                     area.setText(ingest);
+                } catch (FileNotFoundException ex) {
+                    ex.printStackTrace();
                 }
-                catch ( FileNotFoundException ex) { ex.printStackTrace(); }
             }
             // SAVE
         } else if (ae.equals("Save")) {
@@ -118,10 +122,10 @@ public final class ZipEdit extends JFrame implements ActionListener{
                 out.close();
             } catch (FileNotFoundException ex) {
                 Component f = null;
-                JOptionPane.showMessageDialog(f,"File not found.");
+                JOptionPane.showMessageDialog(f, "File not found.");
             } catch (IOException ex) {
                 Component f = null;
-                JOptionPane.showMessageDialog(f,"Error.");
+                JOptionPane.showMessageDialog(f, "Error.");
             }
         } else if (ae.equals("New")) {
             area.setText("");
@@ -130,5 +134,3 @@ public final class ZipEdit extends JFrame implements ActionListener{
         }
     }
 }
-
-

@@ -1,75 +1,65 @@
 package rocks.zipcode.jvi;
 
 public class Controller {
-    private Application _app;
-    private View _view;
-    private Window _window;
-    private String _lastSearchCommand;
-    private String _lastFindChar;
+    private Application app;
+    private View view;
+    private Terminal term;
+    private String lastSearchCommand;
+    private String lastFindChar;
 
-    public Controller(Application app, View v) {
-        _app = app;
-        _view = v;
-        _window = v.get_window();
+    public Controller(Application a, View v, Terminal t) {
+        app = a;
+        view = v;
+        term = t;
+        Command.setController(this);
     }
 
-    public void listenForInputs() {
+    public void mainEventLoop() {
         Command what;
+        view.draw();
         String status = "ready (crtl-c to quit)";
         while (true) {
-            _app.updateViews();
-            _app.updateStatusView(status);
-            _window.setCursor(0, 0);
+            view.draw();
             what = getCommand();
 
             if (what == Command.QUIT)
                 break;
-            if (what == Command.COLON) {
-                // move cursor to status line.
-                status = ":";
-            }
-            if (what == Command.ERR) {
-                status = "error";
-            }
-            if (what == Command.INSERT) {
-                listenInsertMode();
-            }
 
+            what.execute();
         }
     }
 
     private Command getCommand() {
-        int currentKey = _window.readKey();
-        Character ch = (char) currentKey;
+        Character ch = (char) term.readKey();
         Command what = Command.get(Character.toString(ch));
 
-        if (what == Command.COLON) {
-            _app.setMode(Mode.COMMAND);
-            return what;
-        }
-        if (_app.getMode() == Mode.COMMAND) {
-            if (what == Command.QUIT) {
-                return what;
-            }
-        }
         return what;
     }
 
-    private void listenInsertMode() {
-        _app.setMode(Mode.INSERT);
+    protected void listenInsertMode() {
+        app.setMode(Mode.INSERT);
         do {
-            int currentKey = _window.readKey();
-            Character ch = (char) currentKey;
+            Character ch = (char) term.readKey();
 
             if (ch == 27)
                 break;
-            _view.insertAtCursor(ch);
-            _app.updateViews();
+            view.insertAtCursor(ch);
+            view.deltaCursor(0, 1);
+            app.updateViews();
         } while (true);
-        _app.setMode(Mode.COMMAND);
+        app.setMode(Mode.COMMAND);
+    }
+
+    protected void handleCursorMovement(int deltar, int deltac) {
+        view.deltaCursor(deltar, deltac);
+        Point p = view.getCursor();
+        app.updateStatusView(String.format("handle cursor (%d,%d)", 
+            p.r(), p.c()));
     }
 
     private void listenCommandMode() {
+        app.setMode(Mode.COMMAND);
+
     }
 
     private void listenReplaceMode() {
@@ -84,15 +74,12 @@ public class Controller {
     }
 
     //
-    private void handleCursorMovement(int deltar, int deltac) {
-    }
-
     private void handleClearAndDeleteCommands(boolean isClearCommand, int times) {
     }
 
     private void handleYank(int times) {
     }
 
-    private int _repeatCommandNum = 0;
+    private int repeatCommandNum = 0;
 
 }

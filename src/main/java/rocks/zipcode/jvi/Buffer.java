@@ -8,20 +8,108 @@ import java.util.Iterator;
 
 // Buffer is the main text containing Model.
 public class Buffer {
-    Point _point = new Point(0, 0);
-    boolean _unsavedChanges;
-    Integer _startLine;
-    Integer _finishLine;
-    boolean _insertModeEnabled;
-    String _fileName;
-    String _clipboard;
-    Integer _clipboardLines;
-    ArrayList<StringBuffer> _text;
-    // FileHelper _fileHelper;
+    Point point = new Point(0, 0); // point of current edit
+    Point mark = new Point(0, 0);
+    boolean unsavedChanges;
+    Integer startLine;
+    Integer finishLine;
+    boolean insertModeEnabled;
+    String fileName;
+    String clipboard;
+    Integer clipboardLines;
+    ArrayList<StringBuffer> text;
+    // FileHelper fileHelper;
 
     public Buffer(Integer maxLines) {
-        _text = new ArrayList<>();
-        _text.add(0, new StringBuffer(""));
+        text = new ArrayList<>();
+        text.add(0, new StringBuffer(""));
+    }
+
+    public void setPoint(Point tp) {
+        point.set(tp.r(), tp.c());
+    }
+
+    public void replaceCharacter(Character ch, Integer r, Integer c) {
+        point.set(r, c);
+        StringBuffer line = text.get(r);
+        line.deleteCharAt(c);
+        line.insert(c, Character.toString(ch));
+    }
+
+    public void insertCharacter(Character ch, Integer r, Integer c) {
+        if (insertModeEnabled) {
+            point.set(r, c);
+            StringBuffer line = text.get(r);
+            line.insert(c, Character.toString(ch));
+        }
+    }
+
+    public void insertString(String s, Integer r, Integer c) {
+        if (insertModeEnabled) {
+            point.set(r, c);
+            StringBuffer line = text.get(r);
+            line.insert(c, s);
+        }
+    }
+
+    public void insertNewLine(Integer r, Integer c) {
+        // if y == 0, insert empty sb above x
+        // if y == text.x.size(), insert empty sb below x
+        // if y >=0 && y< text.x.size(), split line at y
+    }
+
+    public void deleteCharacter(Integer r, Integer c) {
+        point.set(r, c);
+        StringBuffer line = text.get(r);
+        line.deleteCharAt(c);
+    }
+
+    public void deleteLine(Integer r) {
+        if (hasLine(r))
+            text.remove(r.intValue());
+    }
+
+    private boolean hasLine(Integer r) {
+        if (r >= 0 && r < text.size())
+            return true;
+        return false;
+    }
+
+    public void clear() {
+        text.clear();
+        text.add(0, new StringBuffer(""));
+    }
+
+    //
+    // /*
+    // * A bunch of omitted functions
+    // */
+    //
+    public Integer getNumLines() {
+        return text.size();
+    }
+
+    //
+    public String[] getLines(Integer lineStart, Integer lineFinish) {
+        // NQR...
+        if ((lineStart >= 0) && (lineFinish < text.size())) {
+            String[] strArray = new String[lineFinish - lineStart];
+            for (Integer idx = lineStart; idx < lineFinish; idx++) {
+                strArray[idx - 1] = getLine(idx);
+            }
+            return strArray;
+        } else
+            return null;
+    }
+
+    public String getLine(Integer r) {
+        if (r < text.size())
+            return text.get(r).toString();
+        return "~";
+    }
+
+    public String getFileName() {
+        return fileName;
     }
 
     public String readFile(String fileName) {
@@ -43,89 +131,6 @@ public class Buffer {
         return "File read";
     }
 
-    public void replaceCharacter(Character c, Integer x, Integer y) {
-        _point.set(x, y);
-        StringBuffer line = _text.get(x);
-        line.deleteCharAt(y);
-        line.insert(y, Character.toString(c));
-    }
-
-    public void insertCharacter(Character c, Integer x, Integer y) {
-        if (_insertModeEnabled) {
-            _point.set(x, y);
-            StringBuffer line = _text.get(x);
-            line.insert(y, Character.toString(c));
-        }
-    }
-
-    public void insertString(String s, Integer x, Integer y) {
-        if (_insertModeEnabled) {
-            _point.set(x, y);
-            StringBuffer line = _text.get(x);
-            line.insert(y, s);
-        }
-    }
-
-    public void insertNewLine(Integer x, Integer y) {
-        // if y == 0, insert empty sb above x
-        // if y == _text.x.size(), insert empty sb below x
-        // if y >=0 && y< _text.x.size(), split line at y
-    }
-
-    public void deleteCharacter(Integer x, Integer y) {
-        _point.set(x, y);
-        StringBuffer line = _text.get(x);
-        line.deleteCharAt(y);
-    }
-
-    public void deleteLine(Integer y) {
-        if (_hasLine(y))
-            _text.remove(y.intValue());
-    }
-
-    private boolean _hasLine(Integer y) {
-        if (y >= 0 && y < _text.size())
-            return true;
-        return false;
-    }
-
-    public void clear() {
-        _text.clear();
-        _text.add(0, new StringBuffer(""));
-    }
-
-    //
-    // /*
-    // * A bunch of omitted functions
-    // */
-    //
-    public Integer getNumLines() {
-        return _text.size();
-    }
-
-    //
-    public String[] getLines(Integer lineStart, Integer lineFinish) {
-        // NQR...
-        if ((lineStart >= 0) && (lineFinish <= _text.size())) {
-            String[] sarray = new String[lineFinish - lineStart];
-            for (Integer idx = lineStart; idx <= lineFinish; idx++) {
-                sarray[idx] = getLine(idx);
-            }
-            return sarray;
-        } else
-            return null;
-    }
-
-    public String getLine(Integer y) {
-        if (y < _text.size())
-            return _text.get(y).toString();
-        return "~";
-    }
-
-    public String getFileName() {
-        return _fileName;
-    }
-
     public void saveFile() {
     }
 
@@ -138,19 +143,21 @@ public class Buffer {
 
     //
     public void enableInsertMode() {
-        _insertModeEnabled = true;
+        insertModeEnabled = true;
     }
 
     public void disableInsertMode() {
-        _insertModeEnabled = false;
+        insertModeEnabled = false;
     }
 
     public boolean insertModeOn() {
-        return _insertModeEnabled;
+        return insertModeEnabled;
     }
+
     public void insertChar(Character ch) {
         insert(Character.toString(ch));
     }
+
     //
     // std::pair<Integer, Integer> find(const std::string& s, bool fromCurrentLine =
     // true);
@@ -181,7 +188,7 @@ public class Buffer {
     @Override
     public String toString() {
         StringBuffer fsb = new StringBuffer();
-        Iterator<StringBuffer> sbi = _text.iterator();
+        Iterator<StringBuffer> sbi = text.iterator();
         while (sbi.hasNext()) {
             fsb.append(sbi.next());
             fsb.append("\n");
@@ -205,15 +212,14 @@ public class Buffer {
     }
 
     private void textappend(String s) {
-        if (_text.size() == 1 && _text.get(0).toString().equals("")) {
-            _text.clear();
+        if (text.size() == 1 && text.get(0).toString().equals("")) {
+            text.clear();
         }
-        _text.add(new StringBuffer(s));
+        text.add(new StringBuffer(s));
     }
 
     private void insert(String s) {
-        Integer _r = _point.x();
-        StringBuffer line = _text.get(_r);
-        line.insert(_point.y(), s);
+        StringBuffer line = text.get(point.r());
+        line.insert(point.c(), s);
     }
 }

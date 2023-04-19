@@ -2,31 +2,66 @@ package rocks.zipcode.jvi;
 
 import rocks.zipcode.jvi.util.Stack;
 
+import java.io.IOException;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+
 // Second (and ongoing) version.
 public class Application implements Runnable {
     // private vars
-    private Mode _mode;
-    private View _textView;
-    private Controller _controller;
+    private Terminal terminal;
+    private Point termSize;
 
-    private Stack<Command> _commandStack;
-    private View _statusView;
-    private DebugView _debugView;
-    String _highlighterUsed;
-    String _fileName;
+    private Mode mode;
+    private View textView;
+    private Controller controller;
 
-    // Arraylist<Highlighter> _highlighters;
-    private boolean _debugModeEnabled;
+    private Stack<Command> commandStack;
+    private View statusView;
+    private DebugView debugView;
+    String highlighterUsed;
+    String fileName;
+
+    // Arraylist<Highlighter> highlighters;
+    private boolean debugModeEnabled;
+    // logging
+    Logger logger = Logger.getLogger("JVI");
+    FileHandler fh;
 
     public Application(String filename) {
-        _mode = Mode.COMMAND;
-        _fileName = filename;
-        _textView = new View(23, 80, 0, 0);
-        _statusView = new View(1, 80, 0, 23);
-        _controller = new Controller(this, _textView);
-        if (filename != "") {
-            _textView.readFile(filename);
+        mode = Mode.COMMAND;
+        fileName = filename;
+        terminal = new Terminal();
+        try {
+            termSize = terminal.getTerminalSize();
+            // termSize is like 24x80...
+            textView = new View(terminal, termSize.r()-1, termSize.c(), 0, 0);
+            statusView = new View(terminal, 1, termSize.c(), termSize.r(), 0);
+            controller = new Controller(this, textView, terminal);
+            if (filename != "") {
+                textView.readFile(filename);
+            }
+    
+            } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(-1);
         }
+        // logging
+        try {
+            fh = new FileHandler("jvi.log");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        logger.addHandler(fh);
+        SimpleFormatter formatter = new SimpleFormatter();
+        fh.setFormatter(formatter);
+        logger.setUseParentHandlers(false);
+
+    }
+
+    public Logger appLogger() {
+        return logger;
     }
 
     public static void main(String[] args) throws Exception {
@@ -35,35 +70,34 @@ public class Application implements Runnable {
         // }
         Application app = new Application("test.txt");
         app.run();
+        // on normal exit:
         Terminal.setCookedMode();
         System.out.println("done.");
     }
 
     public Mode getMode() {
-        return null;
+        return mode;
     }
 
     public void setMode(Mode newmode) {
+        mode = newmode;
     }
 
     public void updateViews() {
-        _textView.draw();
+        textView.draw();
     }
 
     public void updateStatusView(String status) {
-        _statusView.setBuffer(status);
-        _statusView.draw();
-    }
-
-    public int getChar() {
-        return 0;
+        statusView.setBuffer(status);
+        statusView.draw();
     }
 
     // public void addHighlighter(HighLighter highlighter);
 
     @Override
     public void run() {
-        _controller.listenForInputs();
+        logger.info("starting main event loop");
+        controller.mainEventLoop();
     }
 
 }
