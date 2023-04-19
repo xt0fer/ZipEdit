@@ -40,3 +40,4 @@ build/
 ## Project
 *.lck
 *.log
+*.log.[1-9]
